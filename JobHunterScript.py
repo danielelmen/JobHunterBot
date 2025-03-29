@@ -36,8 +36,8 @@ genai.configure(api_key=openai_key)
 
 
 # Titles
-st.title("Boulders' Mail Assistentmodul")
-st.write("Tilføj en mail til nedenstående og klik Analyser.")
+st.title("JobHunterBot")
+st.write("Work smarter not harder")
 
 # Input text area
-email_text = st.text_area("Modtaget email:")
+email_text = st.text_area("Insæt job annonce:")
