@@ -72,7 +72,7 @@ def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, 
         return f"⚠️ Fejl i API-kald: {str(e)}"
 
 # Load prompt
-with open("system_jobapplication.txt", "r", encoding="utf-8") as file:
+with open("system_prompt.txt", "r", encoding="utf-8") as file:
     job_prompt = file.read().strip()
 
 # Get API key
