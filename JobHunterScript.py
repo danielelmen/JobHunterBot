@@ -32,8 +32,8 @@ authenticate()
 
 # Load API key securely
 try:
-    gemini_key = st.secrets["api_keys"]["gemini"]
-    genai.configure(api_key=gemini_key)
+    openai_key = st.secrets["api_keys"]["oakey"]
+    genai.configure(api_key=openai_key)
 except KeyError:
     st.error("API-nøgle mangler i secrets!")
     st.stop()
