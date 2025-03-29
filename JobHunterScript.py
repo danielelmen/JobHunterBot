@@ -41,7 +41,7 @@ st.title("JobHunterBot")
 st.write("Work smarter not harder")
 
 # Input text area
-email_text = st.text_area("Indsæt job annonce:")
+job_ad = st.text_area("Indsæt job annonce:")
 
 def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, temperature=0.7, api_key=None):
     """Sends a prompt to the OpenAI API and returns the assistant's reply."""
@@ -77,12 +77,6 @@ with open("system_prompt.txt", "r", encoding="utf-8") as file:
 
 # Get API key
 api_key = st.secrets["api_keys"]["oakey"]
-
-# UI
-st.title("Job Application Generator")
-st.write("Indsæt en jobannonce, og få et udkast til en ansøgning.")
-
-job_ad = st.text_area("Jobannonce:")
 
 if st.button("Generér ansøgning"):
     if job_ad.strip():
