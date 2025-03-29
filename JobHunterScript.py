@@ -1,6 +1,7 @@
 import streamlit as st
 import fitz  # PyMuPDF
 import google.generativeai as genai
+import openai
 
 # Hent brugere fra secrets
 users = st.secrets.get("users", {})
@@ -41,3 +42,30 @@ st.write("Work smarter not harder")
 
 # Input text area
 email_text = st.text_area("Insæt job annonce:")
+
+def load_system_prompt(file_path="system_prompt.txt"):
+    with open(file_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+system_prompt = load_system_prompt()
+
+if st.button("Generér jobansøgning"):
+    if email_text.strip() == "":
+        st.warning("Du skal indsætte en jobannonce.")
+    else:
+        with st.spinner("Genererer ansøgning..."):
+
+            # Brug OpenAI GPT-4
+            response = openai.ChatCompletion.create(
+                model="gpt-4o-mini",  # or gpt-3.5-turbo
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": email_text}
+                ],
+                temperature=0.7,
+                max_tokens=1000
+            )
+
+            application_text = response["choices"][0]["message"]["content"]
+            st.success("Her er dit forslag til ansøgning:")
+            st.text_area("Jobansøgning", application_text, height=300)
