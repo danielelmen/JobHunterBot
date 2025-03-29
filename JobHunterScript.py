@@ -1,7 +1,7 @@
 import streamlit as st
 import fitz  # PyMuPDF
 import google.generativeai as genai
-import openai
+import requests
 
 # Hent brugere fra secrets
 users = st.secrets.get("users", {})
@@ -41,31 +41,60 @@ st.title("JobHunterBot")
 st.write("Work smarter not harder")
 
 # Input text area
-email_text = st.text_area("Insæt job annonce:")
+email_text = st.text_area("Indsæt job annonce:")
 
-def load_system_prompt(file_path="system_prompt.txt"):
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read()
+def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, temperature=0.7, api_key=None):
+    """Sends a prompt to the OpenAI API and returns the assistant's reply."""
+    
+    if api_key is None:
+        raise ValueError("API key is missing.")
 
-system_prompt = load_system_prompt()
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    }
 
-if st.button("Generér jobansøgning"):
-    if email_text.strip() == "":
-        st.warning("Du skal indsætte en jobannonce.")
-    else:
+    data = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_input}
+        ],
+        "max_tokens": max_tokens,
+        "temperature": temperature
+    }
+
+    try:
+        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+        return response.json()["choices"][0]["message"]["content"].strip()
+    except Exception as e:
+        return f"⚠️ Fejl i API-kald: {str(e)}"
+
+# Load prompt
+with open("system_jobapplication.txt", "r", encoding="utf-8") as file:
+    job_prompt = file.read().strip()
+
+# Get API key
+api_key = st.secrets["api_keys"]["oakey"]
+
+# UI
+st.title("Job Application Generator")
+st.write("Indsæt en jobannonce, og få et udkast til en ansøgning.")
+
+job_ad = st.text_area("Jobannonce:")
+
+if st.button("Generér ansøgning"):
+    if job_ad.strip():
         with st.spinner("Genererer ansøgning..."):
-
-            # Brug OpenAI GPT-4
-            response = openai.ChatCompletion.create(
-                model="gpt-4o-mini",  # or gpt-3.5-turbo
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": email_text}
-                ],
+            output = call_openai(
+                system_prompt=job_prompt,
+                user_input=job_ad,
+                model="gpt-4o-mini",
+                max_tokens=700,
                 temperature=0.7,
-                max_tokens=1000
+                api_key=api_key
             )
-
-            application_text = response["choices"][0]["message"]["content"]
-            st.success("Her er dit forslag til ansøgning:")
-            st.text_area("Jobansøgning", application_text, height=300)
+            st.text_area("💡 Forslag til ansøgning:", output, height=300)
+    else:
+        st.warning("Indsæt venligst en jobannonce.")
