@@ -66,7 +66,7 @@ def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, 
     }
 
     if use_tools:
-    data["tools"] = [{"type": "web-search-preview"}]
+        data["tools"] = [{"type": "web-search-preview"}]
 
     try:
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
