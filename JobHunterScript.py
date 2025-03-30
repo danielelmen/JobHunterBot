@@ -88,7 +88,7 @@ if st.button("Analysér"):
             output = call_openai(
                 system_prompt=website_prompt,
                 user_input=website,
-                model="gpt-4o-mini",
+                model="gpt-4o",
                 max_tokens=700,
                 temperature=0.7,
                 api_key=api_key,
