@@ -79,10 +79,11 @@ with open("system_analyse.txt", "r", encoding="utf-8") as file:
 # Get API key
 api_key = st.secrets["api_keys"]["oakey"]
 
+# Analyseknap
 if st.button("Analysér"):
-    if job_om.strip():
-        with st.spinner("Analysér opslaget og virksomheden"):
-            output = call_openai(
+    if job_om.strip() and job_ad.strip():
+        with st.spinner("Vent mens der analyseres..."):
+            analyse_output = call_openai(
                 system_prompt=analyse_prompt,
                 user_input=f"Jobannonce:\n{job_ad}\n\nVirksomhedsbeskrivelse:\n{job_om}",
                 model="gpt-4o-mini",
@@ -90,6 +91,44 @@ if st.button("Analysér"):
                 temperature=0.7,
                 api_key=api_key
             )
-            st.text_area("Jobannonce og virksomhedsoverblik:", output, height=300)
+            # Gem i session state
+            st.session_state["analyse_output"] = analyse_output
+
+            # Vis resultat
+            st.text_area("🔍 Analyse af job og virksomhed:", analyse_output, height=500)
     else:
         st.warning("Indsæt information i begge felter:")
+
+# Hvis analyse-output allerede findes (gemt fra tidligere)
+analyse_output = st.session_state.get("analyse_output", "")
+
+# Valg af ansøgningstype
+valg = st.radio(
+    "Vælg typen af ansøgning:",
+    ("Klassisk", "Alternativ")
+)
+
+# Indlæs systeminstruktion baseret på valget
+if valg == "Klassisk":
+    with open("system_ansog_klassisk.txt", "r", encoding="utf-8") as file:
+        ansog_prompt = file.read().strip()
+elif valg == "Alternativ":
+    with open("system_ansog_alternativ.txt", "r", encoding="utf-8") as file:
+        ansog_prompt = file.read().strip()
+
+
+# Generér ansøgning baseret på analysen
+if st.button("Generér ansøgning"):
+    if analyse_output.strip():
+        with st.spinner("Genererer ansøgning..."):
+            application_output = call_openai(
+                system_prompt=ansog_prompt,
+                user_input=analyse_output,
+                model="gpt-4o-mini",
+                max_tokens=700,
+                temperature=0.7,
+                api_key=api_key
+            )
+            st.text_area("✉️ Forslag til ansøgning:", application_output, height=300)
+    else:
+        st.warning("Du skal analysere først, før du kan generere en ansøgning.")
