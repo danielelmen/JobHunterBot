@@ -106,20 +106,43 @@ if analyse_done:
         ("Klassisk", "Alternativ")
     )
 
+    with open("system_ansog_main.txt", "r", encoding="utf-8") as file:
+        ansog_prompt = file.read().strip()
+
+    with open("info_cv.txt", "r", encoding="utf-8") as file:
+        cv_prompt = file.read().strip()
+
+    with open("info_generelt.txt", "r", encoding="utf-8") as file:
+        generelt_prompt = file.read().strip()
+
     # Indlæs systeminstruktion baseret på valg
     if valg == "Klassisk":
         with open("system_ansog_klassisk.txt", "r", encoding="utf-8") as file:
-            ansog_prompt = file.read().strip()
+            ansogning_eksempel = file.read().strip()
     elif valg == "Alternativ":
         with open("system_ansog_alternativ.txt", "r", encoding="utf-8") as file:
-            ansog_prompt = file.read().strip()
+            ansogning_eksempel = file.read().strip()
+
+    #Sammensætter dynamisk system instruktion
+    custom_prompt = f"""
+    {ansog_prompt} #Du er en... og skal...
+    Her kan du se en tidligere ansøgning jeg har skrevet som er virkelig god. Du skal matche sproget og stilen meget tæt og bruge denne som reference: {ansogning_eksempel}
+
+    Her kan du se et overskueligt overblik over mit CV
+    {cv_prompt}
+
+    Jeg har skrevet dette dokument, for at kunne give så meget relevant information som overhoved muligt:
+    {generelt_prompt}
+
+    Du skal bruge indsatte informationer til at skrive ansøgningen, og det er meget vigtigt at du skriver på præcis samme måde som at jeg skriver.
+    """
 
     # Knappen til at generere ansøgning
     if st.button("Generér ansøgning"):
         if analyse_output.strip():
             with st.spinner("Genererer ansøgning..."):
                 application_output = call_openai(
-                    system_prompt=ansog_prompt,
+                    system_prompt=custom_prompt,
                     user_input=analyse_output,
                     model="gpt-4o-mini",
                     max_tokens=700,
