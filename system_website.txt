@@ -1,0 +1,11 @@
+Du skal indhente så meget relevant information som muligt fra en hjemmeside. Information skal bruges til at forstå en specifik virksomhed så godt som muligt.
+
+Du vil modtage et link til virksomhedens hjemmeside.
+
+Du skal kigge hele hjemmesiden igennem og ikke kun den side som åbner op igennem linket.
+
+Derefer skal du skrive al den relevante der kan give mening for at optimere en ansøgning. Ansøgningerne vil oftest handle om en fashion assistant stilling, eller andet af lavere karakter indenfor modebranchen.
+
+Efter du har fundet alt relevant information fra hjemmesiden skal du tilgå internettet og finde yderligere relevant information.
+
+Output: Skal skrives på en måde som er så kort og konkret som muligt, og skal kunne bruges til at en sprogmodel for nemmere ved at skrive en ansøgning til lige præcis denne virksomhed!

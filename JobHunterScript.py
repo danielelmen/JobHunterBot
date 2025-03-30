@@ -73,34 +73,23 @@ def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, 
         return f"⚠️ Fejl i API-kald: {str(e)}"
 
 # Load prompt
-with open("system_prompt.txt", "r", encoding="utf-8") as file:
-    job_prompt = file.read().strip()
+with open("system_website.txt", "r", encoding="utf-8") as file:
+    website_prompt = file.read().strip()
 
 # Get API key
 api_key = st.secrets["api_keys"]["oakey"]
 
-if st.button("Generér ansøgning"):
-    if job_ad.strip():
-        with st.spinner("Genererer ansøgning..."):
+if st.button("Analysér"):
+    if website.strip():
+        with st.spinner("Analysér opslaget og virksomheden"):
             output = call_openai(
-                system_prompt=job_prompt,
-                user_input=job_ad,
-                model="gpt-4o-mini",
+                system_prompt=website_prompt,
+                user_input=website,
+                model="gpt-4o-mini-search-preview",
                 max_tokens=700,
                 temperature=0.7,
                 api_key=api_key
             )
-            st.text_area("💡 Forslag til ansøgning:", output, height=300)
+            st.text_area("Information om virksomheden:", output, height=300)
     else:
-        st.warning("Indsæt venligst en jobannonce.")
-
-
-client = OpenAI(api_key=api_key)
-
-response = client.response.create(
-    model="gpt-4o-mini",
-    tools=[{"type": "web-search-preview"}],
-    input="Undersøg om der er sommerhuse til leje i teglgaargsparken i Fårvang"
-)
-
-st.text_area(response.output_text, output, height=300)
+        st.warning("Indsæt venligst et link:")
