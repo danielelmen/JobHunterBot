@@ -101,6 +101,6 @@ downloadtxt = "Dear Hiring Manager,\n\nI'm excited to apply for the..."
 st.download_button(
     label="Download your job application letter",
     data=downloadtxt,
-    file_name="application_letter.pdf",  # You could also use .docx or .pdf
+    file_name="application_letter.docx",  # You could also use .docx or .pdf
     mime="text/plain"  # Change this depending on your format
 )
