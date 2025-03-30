@@ -31,22 +31,22 @@ def authenticate():
 
 authenticate()
 
-# Initialiser status for analyse
-if "analyse_done" not in st.session_state:
-    st.session_state["analyse_done"] = False
-
-# Get OpenAI key og konfigurer
+#Get open ai key
 openai_key = st.secrets["api_keys"]["oakey"]
 genai.configure(api_key=openai_key)
 
-# Titel og inputfelter
+
+# Titles
 st.title("JobHunterBot")
 st.write("Work smarter not harder")
+
+# Input text area
 job_ad = st.text_area("Indsæt job annonce:")
 job_om = st.text_area("Indsæt information om virksomheden:")
 
-# Funktion til API-kald
 def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, temperature=0.7, api_key=None):
+    """Sends a prompt to the OpenAI API and returns the assistant's reply."""
+    
     if api_key is None:
         raise ValueError("API key is missing.")
 
@@ -67,14 +67,17 @@ def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, 
 
     try:
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
-        response.raise_for_status()
+        response.raise_for_status()  # Raises HTTPError for bad responses
         return response.json()["choices"][0]["message"]["content"].strip()
     except requests.exceptions.HTTPError as http_err:
         return f"⚠️ API-fejl: {response.status_code} - {response.text}"
 
-# Indlæs analyse-prompt
+# Load prompt
 with open("system_analyse.txt", "r", encoding="utf-8") as file:
     analyse_prompt = file.read().strip()
+
+# Get API key
+api_key = st.secrets["api_keys"]["oakey"]
 
 # Analyseknap
 if st.button("Analysér"):
@@ -86,46 +89,46 @@ if st.button("Analysér"):
                 model="gpt-4o-mini",
                 max_tokens=700,
                 temperature=0.7,
-                api_key=openai_key
+                api_key=api_key
             )
+            # Gem i session state
             st.session_state["analyse_output"] = analyse_output
-            st.session_state["analyse_done"] = True
+
+            # Vis resultat
             st.text_area("🔍 Analyse af job og virksomhed:", analyse_output, height=500)
     else:
         st.warning("Indsæt information i begge felter:")
 
-# Hvis analyse allerede er lavet
+# Hvis analyse-output allerede findes (gemt fra tidligere)
 analyse_output = st.session_state.get("analyse_output", "")
-analyse_done = st.session_state.get("analyse_done", False)
 
-# Vis valg og ansøgning kun efter analyse
-if analyse_done:
-    # Valg af ansøgningstype
-    valg = st.radio(
-        "Vælg typen af ansøgning:",
-        ("Klassisk", "Alternativ")
-    )
+# Valg af ansøgningstype
+valg = st.radio(
+    "Vælg typen af ansøgning:",
+    ("Klassisk", "Alternativ")
+)
 
-    # Indlæs systeminstruktion baseret på valg
-    if valg == "Klassisk":
-        with open("system_ansog_klassisk.txt", "r", encoding="utf-8") as file:
-            ansog_prompt = file.read().strip()
-    elif valg == "Alternativ":
-        with open("system_ansog_alternativ.txt", "r", encoding="utf-8") as file:
-            ansog_prompt = file.read().strip()
+# Indlæs systeminstruktion baseret på valget
+if valg == "Klassisk":
+    with open("system_ansog_klassisk.txt", "r", encoding="utf-8") as file:
+        ansog_prompt = file.read().strip()
+elif valg == "Alternativ":
+    with open("system_ansog_alternativ.txt", "r", encoding="utf-8") as file:
+        ansog_prompt = file.read().strip()
 
-    # Knappen til at generere ansøgning
-    if st.button("Generér ansøgning"):
-        if analyse_output.strip():
-            with st.spinner("Genererer ansøgning..."):
-                application_output = call_openai(
-                    system_prompt=ansog_prompt,
-                    user_input=analyse_output,
-                    model="gpt-4o-mini",
-                    max_tokens=700,
-                    temperature=0.7,
-                    api_key=openai_key
-                )
-                st.text_area("✉️ Forslag til ansøgning:", application_output, height=300)
-        else:
-            st.warning("Du skal analysere først, før du kan generere en ansøgning.")
+
+# Generér ansøgning baseret på analysen
+if st.button("Generér ansøgning"):
+    if analyse_output.strip():
+        with st.spinner("Genererer ansøgning..."):
+            application_output = call_openai(
+                system_prompt=ansog_prompt,
+                user_input=analyse_output,
+                model="gpt-4o-mini",
+                max_tokens=700,
+                temperature=0.7,
+                api_key=api_key
+            )
+            st.text_area("✉️ Forslag til ansøgning:", application_output, height=300)
+    else:
+        st.warning("Du skal analysere først, før du kan generere en ansøgning.")
