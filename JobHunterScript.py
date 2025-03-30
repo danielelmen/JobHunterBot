@@ -146,7 +146,7 @@ if analyse_done:
                     system_prompt=custom_prompt,
                     user_input=analyse_output,
                     model="gpt-4o",
-                    max_tokens=25000,
+                    max_tokens=16384,
                     temperature=0.7,
                     api_key=openai_key
                 )
