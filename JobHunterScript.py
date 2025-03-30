@@ -72,8 +72,8 @@ def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, 
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
         response.raise_for_status()  # Raises HTTPError for bad responses
         return response.json()["choices"][0]["message"]["content"].strip()
-    except Exception as e:
-        return f"⚠️ Fejl i API-kald: {str(e)}"
+    except requests.exceptions.HTTPError as http_err:
+        return f"⚠️ API-fejl: {response.status_code} - {response.text}"
 
 # Load prompt
 with open("system_website.txt", "r", encoding="utf-8") as file:
