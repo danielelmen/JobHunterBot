@@ -94,13 +94,27 @@ if st.button("Generér ansøgning"):
         st.warning("Indsæt venligst en jobannonce.")
 
 
-#Save the letter to the computer
-downloadtxt = "Dear Hiring Manager,\n\nI'm excited to apply for the..."
 
-# Create the download button
-st.download_button(
-    label="Download your job application letter",
-    data=downloadtxt,
-    file_name="application_letter.docx",  # You could also use .docx or .pdf
-    mime="text/plain"  # Change this depending on your format
-)
+#Kopier
+text_to_copy = """Dear Hiring Manager,
+
+I'm excited to apply for the..."""
+
+st.text_area("Generated letter", value=text_to_copy, height=200)
+
+# Kopiér-knap med JavaScript
+copy_js = f"""
+    <script>
+    function copyToClipboard(text) {{
+        navigator.clipboard.writeText(text).then(function() {{
+            alert('Teksten er kopieret til udklipsholderen!');
+        }}, function(err) {{
+            console.error('Kunne ikke kopiere: ', err);
+        }});
+    }}
+    </script>
+    <button onclick="copyToClipboard(`{text_to_copy}`)">📋 Kopiér til udklipsholder</button>
+"""
+
+# Indsæt som HTML
+st.markdown(copy_js, unsafe_allow_html=True)
