@@ -44,7 +44,7 @@ st.write("Work smarter not harder")
 job_ad = st.text_area("Indsæt job annonce:")
 website = st.text_area("Indsæt link til virksomheden:")
 
-def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, temperature=0.7, api_key=None):
+def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, temperature=0.7, api_key=None, use_tools=False):
     """Sends a prompt to the OpenAI API and returns the assistant's reply."""
     
     if api_key is None:
@@ -64,6 +64,9 @@ def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, 
         "max_tokens": max_tokens,
         "temperature": temperature
     }
+
+    if use_tools:
+    data["tools"] = [{"type": "web-search-preview"}]
 
     try:
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
@@ -85,10 +88,11 @@ if st.button("Analysér"):
             output = call_openai(
                 system_prompt=website_prompt,
                 user_input=website,
-                model="gpt-4o-mini-search-preview",
+                model="gpt-4o-mini",
                 max_tokens=700,
                 temperature=0.7,
-                api_key=api_key
+                api_key=api_key,
+                use_tools=True  # Aktiverer 'web-search-preview'
             )
             st.text_area("Information om virksomheden:", output, height=300)
     else:
