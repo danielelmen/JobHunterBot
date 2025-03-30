@@ -106,15 +106,6 @@ if analyse_done:
         ("Klassisk", "Alternativ")
     )
 
-    with open("system_ansog_main.txt", "r", encoding="utf-8") as file:
-        ansog_prompt = file.read().strip()
-
-    with open("info_cv.txt", "r", encoding="utf-8") as file:
-        cv_prompt = file.read().strip()
-
-    with open("info_generelt.txt", "r", encoding="utf-8") as file:
-        generelt_prompt = file.read().strip()
-
     # Indlæs systeminstruktion baseret på valg
     if valg == "Klassisk":
         with open("system_ansog_klassisk.txt", "r", encoding="utf-8") as file:
@@ -123,6 +114,14 @@ if analyse_done:
         with open("system_ansog_alternativ.txt", "r", encoding="utf-8") as file:
             ansogning_eksempel = file.read().strip()
 
+    with open("system_ansog_main.txt", "r", encoding="utf-8") as file:
+        ansog_prompt = file.read().strip()
+
+    with open("info_cv.txt", "r", encoding="utf-8") as file:
+        cv_prompt = file.read().strip()
+
+    with open("info_generelt.txt", "r", encoding="utf-8") as file:
+        generelt_prompt = file.read().strip()        
     #Sammensætter dynamisk system instruktion
     custom_prompt = f"""
     {ansog_prompt} #Du er en... og skal...
@@ -134,21 +133,23 @@ if analyse_done:
     Jeg har skrevet dette dokument, for at kunne give så meget relevant information som overhoved muligt:
     {generelt_prompt}
 
-    Du skal bruge indsatte informationer til at skrive ansøgningen, og det er meget vigtigt at du skriver på præcis samme måde som at jeg skriver.
+    Du skal bruge indsatte informationer til at skrive ansøgningen, og det er meget vigtigt at du skriver på præcis samme måde som at jeg skriver. Lav ikke en overskrift. Indsæt ikke ansøgninger i kvotationstegn. Afslut ikke med venlig hilsen eller telefon nummer etc. Vis kune selve brødteksten.
     """
+
+#f""" Du modtager en tekstfil med information om en job og fakta om virksomheden som jeg skal til at søge. Du skal nu udtrække de information som er relevante fra dette CV til jobbet: {cv_prompt}. Dit output skal være det samme format som i CV'et."""
 
     # Knappen til at generere ansøgning
     if st.button("Generér ansøgning"):
         if analyse_output.strip():
-            with st.spinner("Genererer ansøgning..."):
-                application_output = call_openai(
+            with st.spinner("Matcher ansøgning med dine kompetencer..."):
+                match_output = call_openai(
                     system_prompt=custom_prompt,
                     user_input=analyse_output,
-                    model="gpt-4o-mini",
-                    max_tokens=700,
+                    model="gpt-4o",
+                    max_tokens=25000,
                     temperature=0.7,
                     api_key=openai_key
                 )
-                st.text_area("✉️ Forslag til ansøgning:", application_output, height=300)
+                st.text_area("✉️ Forslag til ansøgning:", match_output, height=300)
         else:
             st.warning("Du skal analysere først, før du kan generere en ansøgning.")
