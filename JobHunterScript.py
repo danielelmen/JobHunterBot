@@ -42,9 +42,9 @@ st.write("Work smarter not harder")
 
 # Input text area
 job_ad = st.text_area("Indsæt job annonce:")
-website = st.text_area("Indsæt link til virksomheden:")
+job_om = st.text_area("Indsæt information om virksomheden:")
 
-def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, temperature=0.7, api_key=None, use_tools=False):
+def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, temperature=0.7, api_key=None):
     """Sends a prompt to the OpenAI API and returns the assistant's reply."""
     
     if api_key is None:
@@ -65,9 +65,6 @@ def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, 
         "temperature": temperature
     }
 
-    if use_tools:
-        data["tools"] = [{"type": "web-search-preview"}]
-
     try:
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
         response.raise_for_status()  # Raises HTTPError for bad responses
@@ -76,24 +73,23 @@ def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, 
         return f"⚠️ API-fejl: {response.status_code} - {response.text}"
 
 # Load prompt
-with open("system_website.txt", "r", encoding="utf-8") as file:
-    website_prompt = file.read().strip()
+with open("system_analyse.txt", "r", encoding="utf-8") as file:
+    analyse_prompt = file.read().strip()
 
 # Get API key
 api_key = st.secrets["api_keys"]["oakey"]
 
 if st.button("Analysér"):
-    if website.strip():
+    if job_om.strip():
         with st.spinner("Analysér opslaget og virksomheden"):
             output = call_openai(
-                system_prompt=website_prompt,
-                user_input=website,
-                model="gpt-4o",
+                system_prompt=analyse_prompt,
+                user_input=f"Jobannonce:\n{job_ad}\n\nVirksomhedsbeskrivelse:\n{job_om}",
+                model="gpt-4o-mini",
                 max_tokens=700,
                 temperature=0.7,
-                api_key=api_key,
-                use_tools=True  # Aktiverer 'web-search-preview'
+                api_key=api_key
             )
-            st.text_area("Information om virksomheden:", output, height=300)
+            st.text_area("Jobannonce og virksomhedsoverblik:", output, height=300)
     else:
-        st.warning("Indsæt venligst et link:")
+        st.warning("Indsæt information i begge felter:")
