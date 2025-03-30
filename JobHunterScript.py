@@ -42,6 +42,7 @@ st.write("Work smarter not harder")
 
 # Input text area
 job_ad = st.text_area("Indsæt job annonce:")
+website = st.text_area("Indsæt link til virksomheden:")
 
 def call_openai(system_prompt, user_input, model="gpt-4o-mini", max_tokens=500, temperature=0.7, api_key=None):
     """Sends a prompt to the OpenAI API and returns the assistant's reply."""
@@ -94,27 +95,12 @@ if st.button("Generér ansøgning"):
         st.warning("Indsæt venligst en jobannonce.")
 
 
+client = OpenAI(api_key=api_key)
 
-#Kopier
-text_to_copy = """Dear Hiring Manager,
+response = client.response.create(
+    model="gpt-4o-mini",
+    tools=[{"type": "web-search-preview"}],
+    input="Undersøg om der er sommerhuse til leje i teglgaargsparken i Fårvang"
+)
 
-I'm excited to apply for the..."""
-
-st.text_area("Generated letter", value=text_to_copy, height=200)
-
-# Kopiér-knap med JavaScript
-copy_js = f"""
-    <script>
-    function copyToClipboard(text) {{
-        navigator.clipboard.writeText(text).then(function() {{
-            alert('Teksten er kopieret til udklipsholderen!');
-        }}, function(err) {{
-            console.error('Kunne ikke kopiere: ', err);
-        }});
-    }}
-    </script>
-    <button onclick="copyToClipboard(`{text_to_copy}`)">📋 Kopiér til udklipsholder</button>
-"""
-
-# Indsæt som HTML
-st.markdown(copy_js, unsafe_allow_html=True)
+st.text_area(response.output_text, output, height=300)
