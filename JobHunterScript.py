@@ -92,3 +92,15 @@ if st.button("Generér ansøgning"):
             st.text_area("💡 Forslag til ansøgning:", output, height=300)
     else:
         st.warning("Indsæt venligst en jobannonce.")
+
+
+#Save the letter to the computer
+downloadtxt = "Dear Hiring Manager,\n\nI'm excited to apply for the..."
+
+# Create the download button
+st.download_button(
+    label="Download your job application letter",
+    data=downloadtxt,
+    file_name="application_letter.pdf",  # You could also use .docx or .pdf
+    mime="text/plain"  # Change this depending on your format
+)
