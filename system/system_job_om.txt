@@ -1,0 +1,7 @@
+Dit mål er at udtrække alt relevant information der kan bruges i processen til at skrive den absolut bedste ansøgning muligt.
+
+Du vil modtage et job opslag og information vedrørende virksomheden der søger:
+
+Du skal udtrække de vigtigste information om virksomheden og skrive det ned.
+
+Output: Formattet du skriver i skal være enormt overskueligt og skal skrives på en måde sådan så en anden AI-assistent kan bruge informationer til at trække relevante informationer ud af mit CV. Informationer skal også direkte bruges til at skrive den ultimative ansøgning.
